@@ -24,7 +24,6 @@ async function run() {
         const taskCollection = client.db("TodoDB").collection("tasks");
 
 
-
         app.post("/addTask", async (req, res) => {
             const task = req.body;
             const result = await taskCollection.insertOne(task);
@@ -32,16 +31,19 @@ async function run() {
         });
         app.get("/tasks", async (req, res) => {
             try {
-                if (!req.query.email) {
-                    return res.status(400).json({ error: "No email provided" });
+                if (!req.query.value) {
+                    return res.status(400).json({ error: "No value provided" });
                 }
+                
 
-                const email = req.query.email;
-                const query = { email: email };
+                if (req.query.value == "all") {
+                    const result = await taskCollection.find().toArray();
+                    return res.json(result);
+                }
+                    const value = req.query.value;
+                    const query = { Status: value };
                 const result = await taskCollection.find(query).toArray();
-                res.json(result);
-
-
+                    res.json(result);
 
             } catch (error) {
                 console.error("Error fetching user:", error);
@@ -49,52 +51,78 @@ async function run() {
             }
         });
 
+        app.put("/editTask", async (req, res) => {
+            try {
+                const body = req.body;
+                if (!req.query.id) {
+                    return res.status(400).json({ error: "No ID provided" });
+                }
 
-        // app.patch("/updateTask", async (req, res) => {
-        //     try {
-        //         const body = req.body;
-        //         if (!req.query.id) {
-        //             return res.status(400).json({ error: "No ID provided" });
-        //         }
+                const id = req.query.id;
+                console.log(id);
+                const query = { _id: new ObjectId(id) };
 
-        //         const id = req.query.id;
-        //         console.log(id);
-        //         const query = { _id: new ObjectId(id) };
+                const result = await taskCollection.updateOne(query, {
+                    $set: { 
+                        TaskName: body.TaskName,
+                        TaskMsg: body.TaskMsg,
+                        TaskDeadline: body.TaskDeadline,
+                        TaskPriority: body.TaskPriority,
+                        Status: body.Status
+                     },
+                });
+                res.json(result);
+            } catch (error) {
+                console.error("Error updating request:", error);
+                res.status(500).json({ error: "Internal server error" });
+            }
+        });
 
-        //         const result = await taskCollection.updateOne(query, {
-        //             $set: { category: body.category },
-        //         });
-        //         res.json(result);
-        //     } catch (error) {
-        //         console.error("Error updating request:", error);
-        //         res.status(500).json({ error: "Internal server error" });
-        //     }
-        // });
 
-        // app.delete('/deleteTask', async (req, res) => {
-        //     try {
+        app.patch("/updateTask", async (req, res) => {
+            try {
+                const body = req.body;
+                if (!req.query.id) {
+                    return res.status(400).json({ error: "No ID provided" });
+                }
 
-        //         if (!req.query.id) {
-        //             return res.status(400).json({ error: "No ID Provided" })
-        //         }
-        //         const id = req.query.id
-        //         const query = { _id: new ObjectId(id) };
-        //         const result = await taskCollection.deleteOne(query)
-        //         res.json(result);
-        //     }
-        //     catch (error) {
-        //         console.error("Error updating request:", error);
-        //         res.status(500).json({ error: "Internal sever error" })
-        //     }
+                const id = req.query.id;
+                console.log(id);
+                const query = { _id: new ObjectId(id) };
 
-        // })
+                const result = await taskCollection.updateOne(query, {
+                    $set: { Status: body.Status },
+                });
+                res.json(result);
+            } catch (error) {
+                console.error("Error updating request:", error);
+                res.status(500).json({ error: "Internal server error" });
+            }
+        });
+
+        app.delete('/deleteTask', async (req, res) => {
+            try {
+
+                if (!req.query.id) {
+                    return res.status(400).json({ error: "No ID Provided" })
+                }
+                const id = req.query.id
+                const query = { _id: new ObjectId(id) };
+                const result = await taskCollection.deleteOne(query)
+                res.json(result);
+            }
+            catch (error) {
+                console.error("Error updating request:", error);
+                res.status(500).json({ error: "Internal sever error" })
+            }
+
+        })
 
 
     } finally {
 
     }
 }
-// Call the function you declare abobe
 run().catch(console.dir);
 // Root Api to check activity
 app.get("/", (req, res) => {
