@@ -20,7 +20,7 @@ const client = new MongoClient(uri, {
 // Create a async fucntion to all others activity
 async function run() {
     try {
-        await client.connect();
+        
         const taskCollection = client.db("TodoDB").collection("tasks");
 
 
