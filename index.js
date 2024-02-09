@@ -50,26 +50,26 @@ async function run() {
         });
 
 
-        app.patch("/updateTask", async (req, res) => {
-            try {
-                const body = req.body;
-                if (!req.query.id) {
-                    return res.status(400).json({ error: "No ID provided" });
-                }
+        // app.patch("/updateTask", async (req, res) => {
+        //     try {
+        //         const body = req.body;
+        //         if (!req.query.id) {
+        //             return res.status(400).json({ error: "No ID provided" });
+        //         }
 
-                const id = req.query.id;
-                console.log(id);
-                const query = { _id: new ObjectId(id) };
+        //         const id = req.query.id;
+        //         console.log(id);
+        //         const query = { _id: new ObjectId(id) };
 
-                const result = await taskCollection.updateOne(query, {
-                    $set: { category: body.category },
-                });
-                res.json(result);
-            } catch (error) {
-                console.error("Error updating request:", error);
-                res.status(500).json({ error: "Internal server error" });
-            }
-        });
+        //         const result = await taskCollection.updateOne(query, {
+        //             $set: { category: body.category },
+        //         });
+        //         res.json(result);
+        //     } catch (error) {
+        //         console.error("Error updating request:", error);
+        //         res.status(500).json({ error: "Internal server error" });
+        //     }
+        // });
 
         // app.delete('/deleteTask', async (req, res) => {
         //     try {
